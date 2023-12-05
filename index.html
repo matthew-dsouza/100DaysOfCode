@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- first I create a base app which can add new tasks and delete them using javascript -->
+    <!-- then I add a feature that resets the input field once the push button is pressed so that a new task can be added -->
+    <!-- next I look into how to use the localStorage api to keep the tasks persistent even when the user reloads the page -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To-Do List App</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div id="newtask">
+        <input type="text" placeholder="Add a task" id="newTaskInput" />
+        <button id="push">Add</button>
+      </div>
+      <div id="tasks"></div>
+    </div>
+
+    <!-- <script src="./script.js" defer></script> -->
+    <script>
+      //
+      //
+      // VARIABLES
+      var tasksArray = [];
+      var tasksString = "";
+      var taskFromLocalStorage = "";
+      let input = "";
+      let output = "";
+      var taskNumber = 0;
+      var currentDeleteButtonParent;
+
+      tasksString;
+
+      //   newArray = tasksString.split(",");
+      //   console.log(newArray);
+
+      //   tasksString = tasksArray.join(", ");
+      //   console.log(tasksString);
+
+      //
+      //
+      // ADD A NEW TASK TO LOCAL STORAGE
+      document.querySelector("#push").onclick = function () {
+        if (document.querySelector("#newTaskInput").value.length == 0) {
+          alert("Kindly Enter Task Name!!!!");
+        } else {
+          // takes the value from the input field
+          newTask = document.querySelector("#newTaskInput").value;
+          //   console.log(newTask);
+
+          //   creates a task element with that input
+          input = `
+                <div class="${`task task-${tasksArray.length}`}">
+                    <span id="taskname">${newTask}</span>
+                    <button class="delete">
+                        <i class="far fa-trash-alt"></i>
+                        </button>
+                        </div>
+                        `;
+          //   console.log(input);
+
+          // put that value into the array
+          tasksArray.push(input);
+          //   console.log(tasksArray);
+
+          //   turn that array into a local string
+          tasksString = tasksArray.join("<> ");
+          //   console.log(tasksString);
+
+          //   putting the string value into localstorage
+          localStorage.setItem("localStorageTasks", tasksString);
+
+            location.reload(true);
+        } //else statement ends
+      };
+
+      //
+      //
+      // TO DISPLAY THE TASKS ON RELOAD
+      if (localStorage.getItem("localStorageTasks")) {
+        // fetching back the string from localstorage and storing it in our string var
+        tasksString = localStorage.getItem("localStorageTasks");
+        // console.log(tasksString);
+
+        // turn that fetched string into an array
+        tasksArray = tasksString.split("<> ");
+        //   console.log(tasksArray);
+
+        for (let i = 0; i < tasksArray.length; i++) {
+          output += tasksArray[i];
+
+          //   console.log(output);
+          document.querySelector("#tasks").innerHTML = output;
+        } // rendering for-loop ends
+      }
+
+      //   //
+      //   //
+      //   // DELETE A TASK FROM LOCAL STORAGE
+      var allTasks = document.querySelectorAll(".delete");
+      for (var i = 0; i < allTasks.length; i++) {
+        // console.log(allTasks.length);
+
+        allTasks[i].onclick = function () {
+          //   this.parentNode.remove();
+
+          currentDeleteButtonParent = this.parentNode;
+          //   console.log(currentDeleteButtonParent);
+
+          // this string contains the classNames of the parent element of the delete button which was clicked
+          var currentDeleteButtonParentClass =
+            currentDeleteButtonParent.className;
+
+          // console.log(currentDeleteButtonParentClass);
+
+          let currentDeleteButtonParentClassesArray =
+            currentDeleteButtonParentClass.split(" ");
+          let classOfTheTaskToBeDeleted =
+            currentDeleteButtonParentClassesArray[1];
+          // console.log(classOfTheTaskToBeDeleted);
+
+          taskNumber = classOfTheTaskToBeDeleted.slice(5);
+          taskNumber = parseInt(taskNumber);
+          console.log(taskNumber);
+
+          delete tasksArray[taskNumber];
+          //   console.log(tasksArray);
+
+          tasksString = tasksArray.join("<> ");
+          //   console.log(tasksString);
+
+          localStorage.setItem("localStorageTasks", tasksString);
+
+          //   localStorage.removeItem(classOfTheTaskToBeDeleted);
+
+            location.reload(true);
+        };
+      } // deleteATask() ends here
+
+      //   document.querySelector("#tasks").innerHTML = "";
+      //   for (let index = 0; index < tasksArray.length; index++) {
+      //     tasksString = localStorage.getItem("localStorageTasks");
+      //     output += `
+      //         <div class="${`task task-${index}`}">
+      //             <span id="taskname">${taskFromLocalStorage}</span>
+      //             <button class="delete">
+      //                 <i class="far fa-trash-alt"></i>
+      //             </button>
+      //         </div>
+      //         `;
+
+      //     //   console.log(output);
+      //     document.querySelector("#tasks").innerHTML = output;
+      //   }
+    </script>
+  </body>
+</html>
