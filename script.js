@@ -27,135 +27,117 @@
 //
 //
 // VARIABLES
-var newTask = "";
-var taskCount;
+var tasksArray = [];
+var tasksString = "";
 var taskFromLocalStorage = "";
+let input = "";
 let output = "";
+var taskNumber = 0;
 var currentDeleteButtonParent;
 
-var localStorageNullCounter = 0;
+tasksString;
 
-//
-//
-// SET TASKCOUNT TO ZERO ON FIRST LOAD
-if (!localStorage.getItem("taskCount")) {
-    localStorage.setItem("taskCount", 0);
-}
-taskCount = localStorage.getItem("taskCount");
-taskCount = parseInt(taskCount);
+//   newArray = tasksString.split(",");
+//   console.log(newArray);
 
-
-//
-//
-// TO DISPLAY THE TASKS ON RELOAD
-document.querySelector("#tasks").innerHTML = "";
-for (let index = 1; index <= taskCount; index++) {
-    taskFromLocalStorage = localStorage.getItem(`task-${index}`);
-    console.log(taskFromLocalStorage);
-
-    //
-    if(taskFromLocalStorage == null) {
-        taskCount = taskCount;
-    }
-    
-    if (taskFromLocalStorage != null) {
-        output += `
-            <div class="${`task task-${index}`}">
-                <span id="taskname">${taskFromLocalStorage}</span>
-                <button class="delete">
-                    <i class="far fa-trash-alt"></i>
-                </button>
-            </div>
-            `;
-
-        //   console.log(output);
-        document.querySelector("#tasks").innerHTML = output;
-    }
-    // 
-} // for loop ends
-
-
-
-
-// taskCount = tempTaskCountBeforeDeletion;
+//   tasksString = tasksArray.join(", ");
+//   console.log(tasksString);
 
 //
 //
 // ADD A NEW TASK TO LOCAL STORAGE
-// document.querySelector("#push").onclick = function () {
-//     if (document.querySelector("#newtask input").value.length == 0) {
-//         alert("Kindly Enter Task Name!!!!");
-//     } else {
-//         // adds the value to localStorage
-//         newTask = document.querySelector("#newTaskInput").value;
-
-//         //   console.log(taskCount);
-
-//         taskCount++;
-//         localStorage.setItem("taskCount", taskCount);
-//         taskCount = localStorage.getItem("taskCount");
-//         localStorage.setItem(`task-${taskCount}`, newTask);
-
-//         // convert taskCount from string to integer
-//         taskCount = parseInt(taskCount);
-//         //   console.log(taskCount);
-
-//         location.reload(true);
-//     } //else statement ends
-// }; // addNewTask() ends here
-
-// ADD A NEW TASK TO LOCAL STORAGE USING AN ARRAY
 document.querySelector("#push").onclick = function () {
-    if (document.querySelector("#newtask input").value.length == 0) {
+    if (document.querySelector("#newTaskInput").value.length == 0) {
         alert("Kindly Enter Task Name!!!!");
     } else {
-        // adds the value to localStorage
+        // takes the value from the input field
         newTask = document.querySelector("#newTaskInput").value;
+        //   console.log(newTask);
 
-        //   console.log(taskCount);
+        //   creates a task element with that input
+        input = `
+                <div class="${`task task-${tasksArray.length}`}">
+                    <span id="taskname">${newTask}</span>
+                    <button class="delete">
+                        <i class="far fa-trash-alt"></i>
+                        </button>
+                        </div>
+                        `;
+        //   console.log(input);
 
-        taskCount++;
-        localStorage.setItem("taskCount", taskCount);
-        taskCount = localStorage.getItem("taskCount");
-        localStorage.setItem(`task-${taskCount}`, newTask);
+        // put that value into the array
+        tasksArray.push(input);
+        //   console.log(tasksArray);
 
-        // convert taskCount from string to integer
-        taskCount = parseInt(taskCount);
-        //   console.log(taskCount);
+        //   turn that array into a local string
+        tasksString = tasksArray.join("<> ");
+        //   console.log(tasksString);
+
+        //   putting the string value into localstorage
+        localStorage.setItem("localStorageTasks", tasksString);
 
         location.reload(true);
     } //else statement ends
-}; // addNewTask() ends here
+};
 
 //
 //
-// DELETE A TASK FROM LOCAL STORAGE
+// TO DISPLAY THE TASKS ON RELOAD
+if (localStorage.getItem("localStorageTasks")) {
+    // fetching back the string from localstorage and storing it in our string var
+    tasksString = localStorage.getItem("localStorageTasks");
+    // console.log(tasksString);
+
+    // turn that fetched string into an array
+    tasksArray = tasksString.split("<> ");
+    //   console.log(tasksArray);
+
+    for (let i = 0; i < tasksArray.length; i++) {
+        output += tasksArray[i];
+
+        //   console.log(output);
+        document.querySelector("#tasks").innerHTML = output;
+    } // rendering for-loop ends
+}
+
+//   //
+//   //
+//   // DELETE A TASK FROM LOCAL STORAGE
 var allTasks = document.querySelectorAll(".delete");
 for (var i = 0; i < allTasks.length; i++) {
+    // console.log(allTasks.length);
+
     allTasks[i].onclick = function () {
         //   this.parentNode.remove();
 
         currentDeleteButtonParent = this.parentNode;
-        // console.log(currentDeleteButtonParent);
+        //   console.log(currentDeleteButtonParent);
 
         // this string contains the classNames of the parent element of the delete button which was clicked
         var currentDeleteButtonParentClass =
             currentDeleteButtonParent.className;
 
-        //   console.log(currentDeleteButtonParentClass);
+        // console.log(currentDeleteButtonParentClass);
 
         let currentDeleteButtonParentClassesArray =
             currentDeleteButtonParentClass.split(" ");
         let classOfTheTaskToBeDeleted =
             currentDeleteButtonParentClassesArray[1];
+        // console.log(classOfTheTaskToBeDeleted);
 
-        //   console.log(classOfTheTaskToBeDeleted);
+        taskNumber = classOfTheTaskToBeDeleted.slice(5);
+        taskNumber = parseInt(taskNumber);
+        console.log(taskNumber);
 
-        localStorage.removeItem(classOfTheTaskToBeDeleted);
-        taskCount--;
-        localStorage.setItem("taskCount", taskCount);
+        delete tasksArray[taskNumber];
+        //   console.log(tasksArray);
 
+        tasksString = tasksArray.join("<> ");
+        //   console.log(tasksString);
 
+        localStorage.setItem("localStorageTasks", tasksString);
+
+        //   localStorage.removeItem(classOfTheTaskToBeDeleted);
 
         location.reload(true);
     };
